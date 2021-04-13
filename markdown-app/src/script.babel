@@ -1,0 +1,145 @@
+import React, {
+  useState,
+  useEffect,
+  useReducer
+} from "https://cdn.skypack.dev/react";
+import ReactDOM from "https://cdn.skypack.dev/react-dom";
+
+marked.setOptions({
+  breaks: true
+});
+
+const defaultState = {
+  expandEditor: false,
+  expandPreviewer: false
+};
+
+const reducer = (state, action) => {
+  if (action.type === "EXP_EDITOR") {
+    return {
+      ...state,
+      expandEditor: !state.expandEditor,
+      expandPreviewer: false
+    };
+  }
+  if (action.type === "EXP_PREVIEWER") {
+    return {
+      ...state,
+      expandEditor: false,
+      expandPreviewer: !state.expandPreviewer
+    };
+  }
+};
+
+function MarkdownApp() {
+  const [editor, setEditor] = useState(placeholder);
+  const [state, dispatch] = useReducer(reducer, defaultState);
+
+  const handleChange = (e) => {
+    setEditor(e.target.value);
+  };
+
+  const Title = () => {
+    return (
+      <div className="jumbotron text-dark bg-warning">
+        <h1 className="mb-1">Markdown Previewer</h1>
+        <div id="author">
+          <p>
+            by{" "}
+            <a href="https://sngkr.netlify.app/" target="_blank">
+              Sangkara
+            </a>
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const classes = state.expandEditor
+    ? ["editor maximized", "previewer hide", "fa-compress-alt"]
+    : state.expandPreviewer
+    ? ["editor hide", "previewer maximized", "fa-compress-alt"]
+    : ["editor", "previewer", "fa-expand-alt"];
+
+  return (
+    <div className="container-fluid">
+      <Title />
+      <div id="content" className="w-75 mx-auto mb-5">
+        <div className="row no-gutters">
+          <div className={"col " + classes[0]}>
+            <div className="mr-2 rounded shadowww border border-secondary">
+              <div className="bg-warning rounded-top d-flex">
+                <i className="fas fa-cannabis my-auto p-2"></i>
+                <p className="my-auto">Editor</p>
+                <i
+                  className={"my-auto ml-auto p-2 fas " + classes[2]}
+                  onClick={() => dispatch({ type: "EXP_EDITOR" })}
+                ></i>
+              </div>
+              <textarea
+                name="markdown"
+                id="editor"
+                className="content-area d-block"
+                value={editor}
+                onChange={handleChange}
+              ></textarea>
+            </div>
+          </div>
+          <div className={"col " + classes[1]}>
+            <div
+              className="ml-2 rounded shadowww border border-secondary bg-light"
+              id="previewer"
+            >
+              <div className="bg-warning rounded-top d-flex">
+                <i className="fas fa-cannabis my-auto p-2"></i>
+                <p className="my-auto">Previewer</p>
+                <i
+                  className={"my-auto ml-auto p-2 fas " + classes[2]}
+                  onClick={() => dispatch({ type: "EXP_PREVIEWER" })}
+                ></i>
+              </div>
+              <div className="content-area p-2">
+                <div
+                  dangerouslySetInnerHTML={{ __html: marked(editor) }}
+                  id="preview"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const placeholder = `# Simple React Markdown Previewer
+
+## You can use GitHub flavored markdown into the editor and see the preview beside as you type
+
+[Check it out the GitHub Flavored Markdown Spec](https://github.github.com/gfm/)
+
+\`You can use inline code\`
+
+\`\`\`
+Or use
+multi-line
+code
+\`\`\`
+
+- Also you
+- can build
+- a list
+
+> Use blockquotes
+
+**And make your text bold**
+
+![React Logo w/ Text](https://goo.gl/Umyytc)
+`;
+
+ReactDOM.render(
+  <React.StrictMode>
+    <MarkdownApp />
+  </React.StrictMode>,
+  document.getElementById("app")
+);
